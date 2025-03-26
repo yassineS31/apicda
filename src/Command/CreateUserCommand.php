@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Entity\Account;
+
 use App\Repository\AccountRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -42,20 +43,52 @@ class CreateUserCommand extends Command
         ;
     }
 
+    // protected function execute(InputInterface $input, OutputInterface $output): int
+    // {
+    //     $io = new SymfonyStyle($input, $output);
+    //     $arg1 = $input->getArgument('firstname');
+
+    //     if ($arg1) {
+    //         $io->note(sprintf('You passed an argument: %s', $arg1));
+    //     }
+    //     $io->writeln('Lastname: '.$input->getArgument('lastname'));
+    //     $io->writeln('Firstname: '.$input->getArgument('firstname'));
+    //     $io->writeln('Email: '.$input->getArgument('email'));
+    //     $io->writeln('Password: '.$input->getArgument('password'));
+    //     $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+    //     return Command::SUCCESS;
+    // }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('firstname');
 
         if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
+            $io->note(sprintf('Vos entrées : ', $arg1));
         }
         $io->writeln('Lastname: '.$input->getArgument('lastname'));
         $io->writeln('Firstname: '.$input->getArgument('firstname'));
         $io->writeln('Email: '.$input->getArgument('email'));
         $io->writeln('Password: '.$input->getArgument('password'));
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('Enregistrmeent réussie !');
 
+        // if(!$this->accountRepository->findBy([$input->getArgument('email')])){
+        //     return Command::FAILURE;
+        // };
+        // Hashage du mot de passe: 
+           
+        $newAccount = new Account();
+        $newAccount->setFirstname($input->getArgument('firstname'))
+            ->setLastName($input->getArgument('lastname'))
+            ->setEmail($input->getArgument('email'))
+            ->setPassword($input->getArgument('password'));
+
+            $this->em->persist($newAccount);
+            $this->em->flush();
         return Command::SUCCESS;
     }
+
+    
 }
