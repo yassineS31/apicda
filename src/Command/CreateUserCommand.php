@@ -63,30 +63,28 @@ class CreateUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('firstname');
+        $firstname = $input->getArgument('firstname');
+        $lastname = $input->getArgument('lastname');
+        $email = $input->getArgument('email');
+        $password = $input->getArgument('password');
 
-        if ($arg1) {
-            $io->note(sprintf('Vos entrées : ', $arg1));
-        }
-        $io->writeln('Lastname: '.$input->getArgument('lastname'));
-        $io->writeln('Firstname: '.$input->getArgument('firstname'));
-        $io->writeln('Email: '.$input->getArgument('email'));
-        $io->writeln('Password: '.$input->getArgument('password'));
-        $io->success('Enregistrmeent réussie !');
 
-        // if(!$this->accountRepository->findBy([$input->getArgument('email')])){
-        //     return Command::FAILURE;
-        // };
+
+        if($this->accountRepository->findOneBy(['email'=>$email])){
+            $io->error('Le compte existe déjà !');
+            return Command::FAILURE;
+        };
         // Hashage du mot de passe: 
            
         $newAccount = new Account();
-        $newAccount->setFirstname($input->getArgument('firstname'))
-            ->setLastName($input->getArgument('lastname'))
-            ->setEmail($input->getArgument('email'))
-            ->setPassword($input->getArgument('password'));
-
+        $newAccount->setFirstname($firstname)
+            ->setLastName($lastname)
+            ->setEmail($email)
+            ->setPassword($this->hasher->hashPassword($newAccount,$password));
+    
             $this->em->persist($newAccount);
             $this->em->flush();
+        $io->success('Compte crée avec succès !');
         return Command::SUCCESS;
     }
 
